@@ -1,72 +1,63 @@
 # Maintainer: Tales A. Mendonça <talesam@gmail.com>
 
-pkgname=pkgbuild-template-translate
-pkgdesc="Package template for BigCommunity"
-# Uncomment and edit the following lines as needed
-#depends=('')
-#makedepends=('')
-#optdepends=('')
-#conflicts=('')
-#provides=('')
-#replaces=('')
+pkgname=gnome-shell-extension-copyous
+pkgdesc="Modern clipboard manager extension for GNOME Shell (full rewrite of Pano)"
 pkgver=$(date +%y.%m.%d)
 pkgrel=$(date +%H%M)
+epoch=1
 arch=('any')
-license=('MIT')
-url="https://github.com/big-comm/${pkgname}"
+license=('GPL-3.0-or-later')
+url="https://github.com/boerdereinar/copyous"
+depends=('gnome-shell>=45'
+         'libgda6'
+         'gsound')
+makedepends=('gobject-introspection'
+             'pnpm'
+             'typescript'
+             'sass'
+             'appstream'
+             'make')
+optdepends=('wl-clipboard: Wayland clipboard support')
+provides=("$pkgname")
 source=("git+${url}.git")
 md5sums=('SKIP')
 
-# Automatically detect and use the correct install file
-if [ -e "${pkgname}.install" ]; then
-    install=${pkgname}.install
-elif [ -e "pkgbuild.install" ]; then
-    install=pkgbuild.install
-fi
-
 prepare() {
-    cd "${srcdir}/${pkgname}"
-    # Add any preparation steps here, if needed
-    # For example: patch -p1 < "${srcdir}/patch-file.patch"
+  cd "${srcdir}/copyous"
+
+  # Clone with submodules if not already done
+  git submodule update --init --recursive
+
+  # Install dependencies
+  pnpm install
 }
 
 build() {
-    cd "${srcdir}/${pkgname}"
-    # Add build steps here, if needed
-    # For example: make
-}
+  cd "${srcdir}/copyous"
 
-check() {
-    cd "${srcdir}/${pkgname}"
-    # Add check/test steps here, if needed
-    # For example: make check
+  # Build the extension using Make
+  make
 }
 
 package() {
-    cd "${srcdir}/${pkgname}"
+  cd "${srcdir}/copyous"
 
-    # Determine the correct source directory
-    if [ -d "${pkgname}" ]; then
-        srcdir="${srcdir}/${pkgname}/${pkgname}"
-    else
-        srcdir="${srcdir}/${pkgname}"
-    fi
+  local uuid="copyous@boerdereinar.dev"
+  local schema="${uuid}.gschema.xml"
+  local destdir="${pkgdir}/usr/share/gnome-shell/extensions/${uuid}"
 
-    # Install files
-    local dirs=("usr" "etc" "opt")
-    for dir in "${dirs[@]}"; do
-        if [ -d "${srcdir}/${dir}" ]; then
-            cp -a "${srcdir}/${dir}" "${pkgdir}/"
-        fi
-    done
+  install -d "${destdir}"
 
-    # Install license file if present
-    if [ -f "LICENSE" ]; then
-        install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-    fi
+  # Extract the built extension zip
+  bsdtar xvf "dist/${uuid}.zip" -C "${destdir}/"
 
-    # Install documentation if present
-    if [ -f "README.md" ]; then
-        install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
-    fi
+  # Install schemas to system location
+  if [ -f "${destdir}/schemas/${schema}" ]; then
+    install -Dm644 "${destdir}/schemas/${schema}" -t "${pkgdir}/usr/share/glib-2.0/schemas/"
+    # Clean up schema directory after installation
+    rm -rf "${destdir}/schemas"
+  fi
+
+  # Install license
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
