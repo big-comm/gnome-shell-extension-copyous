@@ -16,6 +16,7 @@ makedepends=('gobject-introspection'
              'typescript'
              'sass'
              'appstream'
+             'glib2'
              'make')
 optdepends=('wl-clipboard: Wayland clipboard support')
 provides=("$pkgname")
@@ -51,11 +52,9 @@ package() {
   # Extract the built extension zip
   bsdtar xvf "dist/${uuid}.zip" -C "${destdir}/"
 
-  # Install schemas to system location
+  # Compile schemas in the extension directory
   if [ -f "${destdir}/schemas/${schema}" ]; then
-    install -Dm644 "${destdir}/schemas/${schema}" -t "${pkgdir}/usr/share/glib-2.0/schemas/"
-    # Clean up schema directory after installation
-    rm -rf "${destdir}/schemas"
+    glib-compile-schemas "${destdir}/schemas/"
   fi
 
   # Install license
