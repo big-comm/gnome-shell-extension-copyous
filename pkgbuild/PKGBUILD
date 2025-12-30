@@ -44,7 +44,7 @@ package() {
   cd "${srcdir}/copyous"
 
   local uuid="copyous@boerdereinar.dev"
-  local schema="${uuid}.gschema.xml"
+  local schema="org.gnome.shell.extensions.copyous.gschema.xml"
   local destdir="${pkgdir}/usr/share/gnome-shell/extensions/${uuid}"
 
   install -d "${destdir}"
