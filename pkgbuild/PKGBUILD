@@ -20,7 +20,7 @@ makedepends=('gobject-introspection'
              'make')
 optdepends=('wl-clipboard: Wayland clipboard support')
 provides=("$pkgname")
-source=("git+https://github.com/boerdereinar/copyous.git")
+source=("git+${url}.git")
 md5sums=('SKIP')
 
 prepare() {
