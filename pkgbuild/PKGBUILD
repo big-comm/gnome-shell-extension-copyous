@@ -7,7 +7,7 @@ pkgrel=$(date +%H%M)
 epoch=1
 arch=('any')
 license=('GPL-3.0-or-later')
-url="https://github.com/boerdereinar/copyous"
+url="https://github.com/talesam/copyous"
 depends=('gnome-shell>=45'
          'libgda6'
          'gsound')
