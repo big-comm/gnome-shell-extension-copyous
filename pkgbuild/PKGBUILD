@@ -31,7 +31,7 @@ prepare() {
   git submodule update --init --recursive
 
   # Install dependencies
-  pnpm install
+  pnpm install --frozen-lockfile --ignore-scripts
 }
 
 build() {
