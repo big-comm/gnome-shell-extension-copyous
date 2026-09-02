@@ -21,7 +21,10 @@ makedepends=('gobject-introspection'
              'make')
 optdepends=('wl-clipboard: Wayland clipboard support')
 provides=("$pkgname")
-source=("git+${url}.git")
+# Name the branch instead of relying on whatever makepkg resolves as the
+# remote default: a package built from the wrong revision still builds and
+# still installs, so the ref this compiles from belongs in the file.
+source=("git+${url}.git#branch=main")
 md5sums=('SKIP')
 
 prepare() {
